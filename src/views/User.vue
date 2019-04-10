@@ -85,14 +85,15 @@
                 </el-table-column>
             </el-table>
         </div>
-        <div class="block">
+        <div class="page-block">
             <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
+                    background
                     :current-page="currentPageNum"
-                    :page-sizes="[10,20,50,100]"
+                    :page-sizes="[8,20,50,100]"
                     :page-size="currentPageSize"
-                    layout="total, sizes, prev, pager, next, jumper"
+                    layout="sizes,prev, pager, next, jumper"
                     :total="total">
             </el-pagination>
         </div>
@@ -187,7 +188,7 @@
                     ]
                 },
                 currentPageNum:1,
-                currentPageSize:10,
+                currentPageSize:8,
                 total:''
 
 
@@ -381,5 +382,8 @@
         height: 30px;
         line-height: 30px;
         text-align: left;
+    }
+    .page-block{
+        margin-top: 30px;
     }
 </style>

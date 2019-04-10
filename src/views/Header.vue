@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="headerWrapper">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
             <el-menu-item index="1">处理中心</el-menu-item>
             <el-submenu index="2">
@@ -32,6 +32,6 @@
     }
 </script>
 
-<style scoped>
+<style>
 
 </style>

@@ -1,4 +1,5 @@
 <template>
+    <div>
     <el-container>
         <el-header>
             <Header></Header>
@@ -8,20 +9,22 @@
                 <Aside></Aside>
             </el-aside>
             <el-main>
-                <User></User>
+                <router-view></router-view>
             </el-main>
         </el-container>
     </el-container>
+    </div>
 </template>
 
 <script>
-    import User from "@/views/User";
+
     import Aside from "@/views/Aside";
     import Header from "@/views/Header";
 
+
     export default {
         name: "Index",
-        components: {User, Header, Aside}
+        components: { Header, Aside}
     }
 </script>
 

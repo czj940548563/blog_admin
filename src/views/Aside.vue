@@ -1,48 +1,44 @@
 <template>
-    <el-menu
-            default-active="2"
-            class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose">
-        <el-submenu index="1">
-            <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>导航一</span>
-            </template>
-            <el-menu-item-group>
-                <template slot="title">分组一</template>
-                <el-menu-item index="1-1">选项1</el-menu-item>
-                <el-menu-item index="1-2">选项2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="分组2">
-                <el-menu-item index="1-3">选项3</el-menu-item>
-            </el-menu-item-group>
-            <el-submenu index="1-4">
-                <template slot="title">选项4</template>
-                <el-menu-item index="1-4-1">选项1</el-menu-item>
+    <el-menu :default-active="$route.path" unique-opened router>
+        <template v-for="item in $router.options.routes" v-if="!item.hidden">
+            <el-submenu :index="item.name" :key="loadPath(item.path)">
+                <template slot="title"><i :class="fontcontainer">
+                    <span class="iconfont" v-if="item.meta&&item.meta.icon" :class="item.meta.icon"></span>
+                </i>
+                <span v-if="item.meta&&item.meta.title" slot="title">{{item.meta.title}}</span>
+                </template>
+                <el-menu-item-group class="over-hide" v-for="child in item.children" :key="child.name"
+                                    v-if="!child.hidden">
+                    <el-menu-item v-for="" :index="resolvePath(child.path)">{{child.meta.title}}</el-menu-item>
+                </el-menu-item-group>
             </el-submenu>
-        </el-submenu>
-        <el-menu-item index="2">
-            <i class="el-icon-menu"></i>
-            <span slot="title">导航二</span>
-        </el-menu-item>
-        <el-menu-item index="3" disabled>
-            <i class="el-icon-document"></i>
-            <span slot="title">导航三</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
-        </el-menu-item>
+        </template>
     </el-menu>
 </template>
 
 <script>
+    import path from "path";
+
     export default {
-        name: "Aside"
+        name: "Aside",
+        data(){
+            return{
+                basePath:'',
+            }
+        },
+        methods: {
+            loadPath(path){
+                this.basePath=path
+            },
+            resolvePath(path){
+                return this.basePath+'/'+path;
+            }
+        }
     }
 </script>
 
-<style scoped>
-
+<style>
+    .el-menu {
+        height: 100%;
+    }
 </style>

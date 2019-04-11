@@ -31,7 +31,8 @@
                 this.basePath=path
             },
             resolvePath(path){
-                return this.basePath+'/'+path;
+                 let completePath=this.basePath+'/'+ path;
+                 return completePath;
             }
         }
     }

@@ -30,7 +30,6 @@
 
             <el-table
                     ref="multipleTable"
-                    v-loading="loading"
                     :data="userList"
                     tooltip-effect="dark"
                     style="width: 100%"
@@ -78,9 +77,9 @@
                         />
                     </template>
                     <template slot-scope="scope">
-                        <el-button @click="dialogTableVisible=checkRole(scope.row)" type="text" size="small">角色
+                        <el-button @click="dialogTableVisible=checkRole(scope.row)" type="primary" size="mini">角色
                         </el-button>
-                        <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+                        <el-button @click="edit(scope.row)"  size="mini">编辑</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -160,7 +159,6 @@
                 labelPosition: 'left',
                 userList: [],
                 roles: [],
-                loading: true,
                 dialogTableVisible: false,
                 userId: '',
                 multipleSelection: [],
@@ -344,7 +342,6 @@
                     this.total=data1.total;
                     this.currentPageSize=data1.pageSize;
                     this.currentPageNum=data1.pageNum;
-                    this.loading = false;
                     //console.log(this.userList)
                 }).catch(error => {
                     console.log(error)
@@ -357,7 +354,7 @@
                 this.selectAllUser(val,this.currentPageSize)
             }
         },
-        created() {
+        mounted() {
             this.selectAllUser(this.currentPageNum,this.currentPageSize);
         }
     }

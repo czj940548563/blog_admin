@@ -6,7 +6,7 @@
                 <el-button type="primary" icon="el-icon-plus" size="small" @click="dialogFormVisible = true">添加用户
                 </el-button>
             </div>
-            <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+            <el-dialog title="添加用户" :visible.sync="dialogFormVisible" @close="closeAddUser">
                 <el-form :model="addUser" status-icon :rules="rules" :label-position="labelPosition" label-width="80px"
                          ref="addUser">
                     <el-form-item label="账号" prop="account">
@@ -22,6 +22,27 @@
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="resetForm('addUser')">重置</el-button>
                     <el-button type="primary" @click="submitUser('addUser')">确定</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog title="编辑" :visible.sync="dialogFormEditVisible" @close="closeEditUser">
+                <el-form :model="editUser" status-icon :rules="rules1" :label-position="labelPosition"
+                         label-width="80px"
+                         ref="editUser">
+                    <el-form-item label="账号" prop="account">
+                        <el-input v-model="editUser.account" autocomplete="off" disabled="disabled"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input v-model="editUser.password" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" prop="mobile">
+                        <el-input v-model="editUser.mobile" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱" prop="mail">
+                        <el-input v-model="editUser.mail" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="updateUser('editUser')">确定</el-button>
                 </div>
             </el-dialog>
         </div>
@@ -79,7 +100,7 @@
                     <template slot-scope="scope">
                         <el-button @click="dialogTableVisible=checkRole(scope.row)" type="primary" size="mini">角色
                         </el-button>
-                        <el-button @click="edit(scope.row)"  size="mini">编辑</el-button>
+                        <el-button @click="edit(scope.row)" size="mini">编辑</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -155,6 +176,16 @@
                     callback();
                 }
             };
+            var checkPassword = (rule, value, callback) => {
+                if (value != '') {
+                    if (value !== '') {
+                        if (value.length > 16) {
+                            callback(new Error('密码不能大于16位'))
+                        }
+                    }
+                    callback();
+                }
+            };
             return {
                 labelPosition: 'left',
                 userList: [],
@@ -165,12 +196,14 @@
                 deleteIndex: [],
                 search: '',
                 dialogFormVisible: false,
+                dialogFormEditVisible: false,
                 addUser: {
                     account: '',
                     password: '123456',
                     mobile: '',
                     mail: ''
                 },
+                editUser: [],
                 rules: {
                     account: [
                         {required: true, message: '请输入账号', trigger: 'blur'},
@@ -185,16 +218,32 @@
                         {validator: checkPhone, trigger: 'blur'}
                     ]
                 },
-                currentPageNum:1,
-                currentPageSize:8,
-                total:''
+                rules1: {
+                    mail: [
+                        {required: true, message: '请输入邮箱地址', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+                    ],
+                    mobile: [
+                        {required: true, message: '请输入手机号码', trigger: 'blur'},
+                        {validator: checkPhone, trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {validator: checkPassword, trigger: 'blur'}
+                    ]
+                },
+                currentPageNum: 1,
+                currentPageSize: 8,
+                total: ''
 
 
             }
         },
         methods: {
-            deleteRow(index, rows) {
-                rows.splice(index, 1);
+
+            edit(val) {
+                this.editUser = val;
+                this.dialogFormEditVisible = true;
             },
             checkRole(val) {
                 this.roles = val.roles;
@@ -205,6 +254,9 @@
                 var date = row[column.property];
                 return date.substring(0, 10)
             },
+            /**
+             * 删除用户的某个角色
+             * */
             deleteRoleRow(index, rows, uId) {
                 var userId = uId;
                 var roleId = rows[index].id;
@@ -230,6 +282,10 @@
                     center: true
                 });
             },
+            /**
+             *
+             * 批量删除
+             * */
             batchDeleteUser() {
                 var ids = [];
                 let selection = this.multipleSelection;
@@ -243,7 +299,7 @@
                 }).then((date) => {
                     var code = date.code;
                     if (code == '200') {
-                        for (var i = this.deleteIndex.length - 1; i >= 0; i--) {//逆向循环防止破坏数组下标
+                        for (var i = this.deleteIndex.length - 1; i >= 0; i--) {//逆向循环待删除的数组防止破坏数组下标
                             this.userList.splice(this.deleteIndex[i], 1)
                         }
                         this.deleteRoleSucess();
@@ -269,7 +325,9 @@
                 }
 
             },
-
+            /**
+             * 将选中的行id放进待删除的数组中，后续进行对数组遍历删除
+             * */
             handleSelectionChange(val) {
                 this.multipleSelection = val;
                 this.deleteIndex = [];
@@ -284,13 +342,23 @@
                 })
 
             },
+            //重置
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
+            //清楚表单验证结果
+            clearFormValidate(formName){
+                this.$refs[formName].clearValidate();
+            },
+            /**
+             * 新增用户
+             *
+             * */
             submitUser(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$ajax.post('/api/auth/regist', this.addUser, {
+                        let subData = this.addUser;
+                        this.$ajax.post('/api/auth/regist', subData, {
                             headers: {
                                 'Content-Type': 'application/json'
                             }
@@ -304,8 +372,9 @@
                                     center: true,
                                     type: 'success'
                                 });
-                                this.selectAllUser();
+                                this.selectAllUser(this.currentPageNum, this.currentPageSize);
                                 this.dialogFormVisible = false;
+                                this.clearFormValidate(formName);
                             } else {
                                 this.$message({
                                     showClose: true,
@@ -326,11 +395,65 @@
                     }
                 });
             },
-            selectAllUser(pageNum,pageSize) {
-                this.$ajax.get('/api/auth/selectAllUser',{
+            closeAddUser(){
+                this.clearFormValidate('addUser');
+                this.resetForm('addUser');
+            },
+            closeEditUser(){
+                this.clearFormValidate('editUser');
+            },
+            updateUser(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        let subData = this.editUser;
+                        this.$ajax.post('/api/auth/updateUser', subData, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function (res) {
+                            return res.data;
+                        }).then((data) => {
+                            if (data.code == '200') {
+                                this.$message({
+                                    showClose: true,
+                                    message: '更新成功',
+                                    center: true,
+                                    type: 'success'
+                                });
+                                this.selectAllUser(this.currentPageNum, this.currentPageSize);
+                                this.dialogFormEditVisible = false;
+                                this.clearFormValidate(formName);
+                            } else {
+                                this.$message({
+                                    showClose: true,
+                                    message: data.msg,
+                                    center: true,
+                                    type: 'error'
+                                });
+                            }
+                        });
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            message: '请输入正确的数据',
+                            center: true,
+                            type: 'warning'
+                        });
+                        return false;
+                    }
+                });
+
+            },
+            /**
+             * 分页查找用户
+             * @param pageNum
+             * @param pageSize
+             */
+            selectAllUser(pageNum, pageSize) {
+                this.$ajax.get('/api/auth/selectAllUser', {
                     params: {
                         pageNum: pageNum,
-                        pageSize:pageSize
+                        pageSize: pageSize
                     }
                 }).then(
                     function (res) {
@@ -339,23 +462,31 @@
                 ).then((data) => {
                     let data1 = data.data;
                     this.userList = data1.list;
-                    this.total=data1.total;
-                    this.currentPageSize=data1.pageSize;
-                    this.currentPageNum=data1.pageNum;
+                    this.total = data1.total;
+                    this.currentPageSize = data1.pageSize;
+                    this.currentPageNum = data1.pageNum;
                     //console.log(this.userList)
                 }).catch(error => {
                     console.log(error)
                 });
             },
+            /**
+             * 每页条数变化时触发
+             * @param val
+             */
             handleSizeChange(val) {
-                this.selectAllUser(this.currentPageNum,val)
+                this.selectAllUser(this.currentPageNum, val)
             },
+            /**
+             * 当前页改变是触发
+             * @param val
+             */
             handleCurrentChange(val) {
-                this.selectAllUser(val,this.currentPageSize)
+                this.selectAllUser(val, this.currentPageSize)
             }
         },
         mounted() {
-            this.selectAllUser(this.currentPageNum,this.currentPageSize);
+            this.selectAllUser(this.currentPageNum, this.currentPageSize);
         }
     }
 </script>
@@ -380,7 +511,8 @@
         line-height: 30px;
         text-align: left;
     }
-    .page-block{
+
+    .page-block {
         margin-top: 30px;
     }
 </style>

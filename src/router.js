@@ -44,6 +44,13 @@ export const constantRouterMap = [
                 //meta: { title: 'Tree', icon: 'icon-gengduotianchong' }
                 meta: { title: '角色',icon: 'fa fa-address-book' },
             },
+            {
+                path: 'right',
+                name: 'Right',
+                component: () => import(/* webpackChunkName: "list" */ '@/views/Right'),
+                //meta: { title: 'Tree', icon: 'icon-gengduotianchong' }
+                meta: { title: '权限',icon: 'fa fa-address-book' },
+            },
         ]
     }
     // { path: '*', redirect: '/404', hidden: true }

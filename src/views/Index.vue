@@ -4,7 +4,7 @@
             <el-header>
                 <Header></Header>
             </el-header>
-            <el-container>
+            <el-container class="main-container">
                 <el-aside width="200px">
                     <Aside></Aside>
                 </el-aside>
@@ -130,6 +130,9 @@
     }
 </script>
 
-<style scoped>
-
+<style>
+    .main-container{
+        padding: 0;
+        margin-top: 12px;
+    }
 </style>

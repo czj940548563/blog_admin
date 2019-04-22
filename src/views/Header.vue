@@ -1,23 +1,17 @@
 <template>
-    <div class="headerWrapper">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-            <el-menu-item index="1">处理中心</el-menu-item>
-            <el-submenu index="2">
-                <template slot="title">我的工作台</template>
-                <el-menu-item index="2-1">选项1</el-menu-item>
-                <el-menu-item index="2-2">选项2</el-menu-item>
-                <el-menu-item index="2-3">选项3</el-menu-item>
-                <el-submenu index="2-4">
-                    <template slot="title">选项4</template>
-                    <el-menu-item index="2-4-1">选项1</el-menu-item>
-                    <el-menu-item index="2-4-2">选项2</el-menu-item>
-                    <el-menu-item index="2-4-3">选项3</el-menu-item>
-                </el-submenu>
-            </el-submenu>
-            <el-menu-item index="3" disabled>消息中心</el-menu-item>
-            <el-menu-item index="4"><a href="https://www.ele.me" target="_blank">订单管理</a></el-menu-item>
-        </el-menu>
-    </div>
+    <header class="header">
+        <ul class="header-logo">
+        <a href="https://github.com/czj940548563/blog_admin"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+        <img src="./logo.svg" alt="logo" >
+        </ul>
+        <ul class="header-operations">
+            <li>
+                <span class="header-lang is-active"></span>
+                <span class="header-opacity"></span>
+            </li>
+            <li></li>
+        </ul>
+    </header>
 </template>
 
 <script>
@@ -29,9 +23,58 @@
                 activeIndex2: '1'
             };
         },
+        props: {
+            user: {
+            }
+        },
     }
 </script>
 
 <style>
+    .header{
+        background-color: rgb(32, 160, 255);
+        height: 80px;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        padding: 0 20px;
+        z-index: 999;
+        box-sizing: border-box;
+        position: fixed;
+    }
+    .header-logo {
+        display: inline-block;
+        float: left;
+        line-height: 80px;
+    }
+    .header-operations {
+        display: inline-block;
+        float: right;
+        padding-right: 30px;
+        height: 100%;
+        margin: 0;
+    }
+    .header-operations li {
+        color: #fff;
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0 10px;
+        margin: 0 10px;
+        line-height: 80px;
+        cursor: pointer;
+    }
+    .header-operations li:first-child{
+        cursor: default
+    }
+    .header-opacity{
+        opacity: .7;
+    }
+    .header-operations:after, header:after {
+        display: inline-block;
+        content: "";
+        height: 100%;
+        vertical-align: middle;
+    }
 
 </style>

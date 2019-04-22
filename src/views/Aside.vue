@@ -1,19 +1,21 @@
 <template>
     <el-menu :default-active="$route.path" unique-opened router>
-        <template v-for="item in $router.options.routes" v-if="!item.hidden">
-            <el-submenu :index="item.name" :key="loadPath(item.path)">
-                <template slot="title"><i :class="fontcontainer">
+        <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
+            <el-submenu :index="item.name" :key="index">
+                <template slot="title">
+                    <i>
                     <span class="iconfont" v-if="item.meta&&item.meta.icon" :class="item.meta.icon"></span>
                 </i>
-                <span v-if="item.meta&&item.meta.title" slot="title">{{item.meta.title}}</span>
+                    <span v-if="item.meta&&item.meta.title" slot="title">{{item.meta.title}}</span>
                 </template>
-                <el-menu-item-group class="over-hide" v-for="child in item.children" :key="child.name"
+                <el-menu-item-group class="over-hide" v-for="(child,index) in item.children" :key="index"
                                     v-if="!child.hidden">
-                    <el-menu-item v-for="" :index="resolvePath(child.path)">{{child.meta.title}}</el-menu-item>
+                    <el-menu-item  :index="resolvePath(item.path,child.path)">{{child.meta.title}}</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
         </template>
     </el-menu>
+
 </template>
 
 <script>
@@ -28,11 +30,12 @@
         },
         methods: {
             loadPath(path){
-                this.basePath=path
+                this.basePath=path;
+                return path
             },
-            resolvePath(path){
-                 let completePath=this.basePath+'/'+ path;
-                 return completePath;
+            resolvePath(parentPath,path){
+                let completePath=parentPath+'/'+ path;
+                return completePath;
             }
         }
     }

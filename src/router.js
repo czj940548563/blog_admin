@@ -52,8 +52,38 @@ export const constantRouterMap = [
                 meta: { title: '权限',icon: 'fa fa-address-book' },
             },
         ]
-    }
-    // { path: '*', redirect: '/404', hidden: true }
+    },
+    {
+        path: '/blog',
+        component:Index,
+        name: 'Blog',
+        redirect: '/article',
+        meta: { title: '博客',icon: 'fa fa-address-book' },
+        children: [
+            {
+                path: 'article',
+                name: 'Article',
+                component: () => import(/* webpackChunkName: "list" */ '@/blog/Article'),
+                //meta: { title: 'User', icon: 'icon-shoujitianchong' }
+                meta: { title: '文章',icon: 'fa fa-address-book' },
+            },
+            {
+                path: 'dustbin',
+                name: 'Dustbin',
+                component: () => import(/* webpackChunkName: "list" */ '@/blog/Dustbin'),
+                //meta: { title: 'User', icon: 'icon-shoujitianchong' }
+                meta: { title: '垃圾箱',icon: 'fa fa-address-book' },
+            },
+            {
+                path: 'drafts',
+                name: 'Drafts',
+                component: () => import(/* webpackChunkName: "list" */ '@/blog/Drafts'),
+                //meta: { title: 'User', icon: 'icon-shoujitianchong' }
+                meta: { title: '草稿箱',icon: 'fa fa-address-book' },
+            },
+        ]
+    },
+    { path: '*', redirect: '/404', hidden: true }
 ]
 
 export default new Router({

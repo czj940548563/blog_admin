@@ -8,6 +8,7 @@ Vue.use(Router)
 
 export const constantRouterMap = [
     // { path: '/404', component: () => import('@/views/404'), hidden: true },
+    { path: '/login',name:'Login', component: () => import('@/views/login/Index'), hidden: true },
     {
         path: '/',
         component: Index,
@@ -90,6 +91,5 @@ export default new Router({
     mode: 'history',
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRouterMap
-
 })
 

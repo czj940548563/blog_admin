@@ -13,7 +13,7 @@ module.exports = {
         proxy: {
             //配置跨域
             '/api': {
-                target: "http://localhost:8081/blog/api",
+                target: "http://127.0.0.1:8081/blog/api",
                 ws:true,
                 changOrigin:true,
                 pathRewrite:{

@@ -8,7 +8,7 @@
             </div>
             <!--添加角色dialog---------->
             <el-dialog title="添加角色" :visible.sync="dialogAddRole" @close="closeAddRole">
-                <el-form :model="addRole" status-icon  :label-position="labelPosition" label-width="80px"
+                <el-form :model="addRole" status-icon :rules="addRoleRule"  :label-position="labelPosition" label-width="80px"
                          ref="addRole">
                     <el-form-item label="角色名称" prop="roleName">
                         <el-input v-model="addRole.roleName" autocomplete="off"></el-input>
@@ -29,7 +29,7 @@
             <!----------编辑角色dialog------->
             <div class="edit-role">
                 <el-dialog title="编辑" :visible.sync="dialogEditRole" @close="closeEditRole">
-                    <el-form :model="editRole" status-icon :label-position="labelPosition"
+                    <el-form :model="editRole" status-icon :rules="editRoleRule" :label-position="labelPosition"
                              label-width="80px"
                              ref="editRole">
                         <el-form-item label="角色名称" prop="roleName">
@@ -61,7 +61,7 @@
                 <!--角色列表--->
                 <el-table
                         ref="multipleTable"
-                        :data="roleList"
+                        :data="this.roleList"
                         tooltip-effect="dark"
                         style="width: 100%"
                         @selection-change="handleSelectionChange"
@@ -112,9 +112,9 @@
                             />
                         </template>
                         <template slot-scope="scope">
-                            <el-button @click="dialogCheckRight=checkRight(scope.row)" type="primary" size="mini">权限
+                            <el-button @click="dialogCheckRight=checkRight(scope.row)" type="danger" size="mini">权限
                             </el-button>
-                            <el-button @click="edit(scope.row)" size="mini">编辑</el-button>
+                            <el-button @click="edit(scope.row)" size="mini" icon="el-icon-edit" type="primary">编辑</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -225,7 +225,8 @@
         confirmAdd,
         addSucess,
         confirmDelete,
-        resetForm
+        resetForm,
+        returnMsg
     } from "@/assets/authJs/common";
 
     export default {
@@ -251,10 +252,25 @@
                 rightCurrentPage: 1,
                 total: '',
                 rightTotal: '',
+                search:'',
                 //增加用户form表单绑定对象
                 addRole: {
                     roleName: '',
                     description: '',
+                    rights:[],
+                },
+
+                //添加角色的校验规则
+                addRoleRule: {
+                    roleName: [
+                        {required: true, message: '角色名称不能为空', trigger: 'blur'},
+                    ],
+                },
+                //编辑角色的校验规则
+                editRoleRule: {
+                    roleName: [
+                        {required: true, message: '角色名称不能为空', trigger: 'blur'},
+                    ],
                 },
                 rightTableKey: [
                     {
@@ -393,14 +409,16 @@
                 data.append('ids', ids);
                 this.$ajax.post('/api/auth/deleteRoles', data).then(function (response) {
                     return response.data;
-                }).then((date) => {
-                    var code = date.code;
+                }).then((data) => {
+                    var code = data.code;
                     if (code == '200') {
                         for (var i = this.selectionIds.length - 1; i >= 0; i--) {//逆向循环待删除的数组防止破坏数组下标
                             this.roleList.splice(this.selectionIds[i], 1)
                         }
                         deleteSucess(this);
 
+                    }else {
+                        returnMsg(this,data.msg,'error')
                     }
                 })
             },
@@ -553,6 +571,7 @@
              * */
             closeEditRole() {
                 clearFormValidate(this, 'editRole');
+                resetForm(this, 'editRole');
             },
             edit(val) {
                 this.editRole = val;
@@ -629,7 +648,7 @@
 
         },
 
-        mounted() {
+        created() {
             this.selectAllRole(this.currentPageNum, this.currentPageSize);
         }
     }

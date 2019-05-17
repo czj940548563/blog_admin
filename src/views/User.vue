@@ -38,16 +38,13 @@
                     <el-form-item label="账号" prop="account">
                         <el-input v-model="editUser.account" autocomplete="off" disabled="disabled"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码" prop="password">
-                        <el-input v-model="editUser.password" autocomplete="off"></el-input>
-                    </el-form-item>
                     <el-form-item label="手机号" prop="mobile">
                         <el-input v-model="editUser.mobile" autocomplete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="邮箱" prop="mail">
                         <el-input v-model="editUser.mail" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="状态" prop="enable" >
+                    <el-form-item label="状态" prop="enable">
                         <el-switch class="enable-switch"
                                    v-model="editUser.enable"
                                    active-color="#13ce66"
@@ -68,7 +65,7 @@
             <!------------user列表------------------->
             <el-table
                     ref="multipleTable"
-                    :data="userList"
+                    :data="this.userList"
                     tooltip-effect="dark"
                     style="width: 100%"
                     @selection-change="handleSelectionChange"
@@ -123,9 +120,10 @@
                         />
                     </template>
                     <template slot-scope="scope">
-                        <el-button @click="dialogCheckRole=checkRole(scope.row)" type="primary" size="mini">角色
+                        <el-button @click="dialogCheckRole=checkRole(scope.row)" type="danger" size="mini">角色
                         </el-button>
-                        <el-button @click="edit(scope.row)" size="mini">编辑</el-button>
+                        <el-button @click="edit(scope.row)" size="mini" icon="el-icon-edit" type="primary">编辑
+                        </el-button>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -228,6 +226,7 @@
 
 <script>
     import RoleTable from '@/components/authCommon/AuthOtherRoleOrRight';
+    import md5 from 'js-md5';
     import {
         dateFormat,
         confirmAdd,
@@ -239,12 +238,13 @@
         addSucess,
         clearFormValidate,
         resetForm,
-        confirmDelete
+        confirmDelete,
+        returnMsg
     } from "@/assets/authJs/common";
 
     export default {
         name: "User",
-        components: { RoleTable},
+        components: {RoleTable},
         data() {
             return {
 
@@ -361,7 +361,8 @@
                     password: '123456',
                     mobile: '',
                     mail: '',
-                    enable:'',
+                    enable: '',
+                    roles: [],
                 },
 
                 editUser: [],
@@ -388,10 +389,6 @@
                         {required: true, message: '请输入手机号码', trigger: 'blur'},
                         {validator: checkPhone, trigger: 'blur'}
                     ],
-                    password: [
-                        {required: true, message: '请输入密码', trigger: 'blur'},
-                        {validator: checkPassword, trigger: 'blur'}
-                    ]
                 },
                 currentPageNum: 1,
                 currentPageSize: 8,
@@ -444,14 +441,15 @@
                 data.append('ids', ids);
                 this.$ajax.post('/api/auth/deleteUsers', data).then(function (response) {
                     return response.data;
-                }).then((date) => {
-                    var code = date.code;
+                }).then((data) => {
+                    var code = data.code;
                     if (code == '200') {
                         for (var i = this.selectionIds.length - 1; i >= 0; i--) {//逆向循环待删除的数组防止破坏数组下标
                             this.userList.splice(this.selectionIds[i], 1)
                         }
                         deleteSucess(this);
-
+                    } else {
+                        returnMsg(this, data.msg, 'error')
                     }
                 })
             },
@@ -460,11 +458,11 @@
                 return true;
             },
             confirmDeleteUser() {
-                confirmDelete(this,this.multipleSelection,'user')
+                confirmDelete(this, this.multipleSelection, 'user')
             }
             ,
             confirmAddRoles() {
-                confirmAdd(this,this.roleMultipleSelection, 'user');
+                confirmAdd(this, this.roleMultipleSelection, 'user');
             }
             ,
             batchAddRoles() {
@@ -534,6 +532,7 @@
             submitUser(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        this.addUser.password=md5(this.addUser.password);
                         let subData = this.addUser;
                         this.$ajax.post('/api/auth/insertUser', subData, {
                             headers: {
@@ -578,6 +577,7 @@
             ,
             closeEditUser() {
                 clearFormValidate(this, 'editUser');
+                resetForm(this, 'editUser');
             }
             ,
             updateUser(formName) {
@@ -588,8 +588,8 @@
                             headers: {
                                 'Content-Type': 'application/json'
                             }
-                        }).then(function (res) {
-                            return res.data;
+                        }).then((response)=> {
+                            return response.data;
                         }).then((data) => {
                             if (data.code == '200') {
                                 updateSucess(this);

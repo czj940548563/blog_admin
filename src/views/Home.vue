@@ -1,5 +1,9 @@
 <template>
-    <p>welcome</p>
+    <div><p>welcome</p>
+        <font-awesome-icon icon="coffee"/>
+    </div>
+
+
 </template>
 
 <script>
